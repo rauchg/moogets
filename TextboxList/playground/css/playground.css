@@ -1,0 +1,35 @@
+body { 
+  background: #222; 
+  font: 0.85em "Lucida Grande", "Tahoma";
+  padding: 2em 3em; 
+  color: #ccc;
+}
+
+h1, h2, h3, h4, h5, h6, legend {
+  font-family: "Helvetica";
+  font-weight: bold;
+  text-shadow: 1px 2px 1px #000;
+}
+
+h1 {
+  text-align: center;
+}
+
+legend {
+  padding: 1em;
+}
+
+fieldset {
+  border: 1px dotted #666;
+  padding: 0 1em 1.5em;
+}
+
+label {
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+
+#sample_input, #sample_input_textboxlist {
+  width: 400px;
+}
