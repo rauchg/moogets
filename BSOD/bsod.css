@@ -1,0 +1,8 @@
+#bsod { background: #0000AA; position: fixed; top: 0; left: 0; color: #fff; font: bold 12px "Lucida Console", "Monospace"; }
+#bsod-content { width: 600px; margin: auto; }
+#bsod-content h1, #bsod-content p { margin-bottom: 20px; font: bold 12px "Lucida Console", "Monospace"; }
+#bsod-content p { line-height: 16px; }
+#bsod-content h1 { text-align: center; }
+#bsod-content h1 span { background: #9A9A9A; padding: 1px 7px; color: #0000AA; }
+#bsod-content .exit { text-align: center; }
+#bsod .underscore { color: #9A9A9A; }
