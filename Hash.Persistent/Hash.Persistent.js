@@ -1,21 +1,13 @@
 /*
- Moogets - Hash.Persistent
-	- MooTools version required: 1.2
-	- MooTools components required: 
-		Core: JSON and dependencies. Swiff and dependencies required for swiff provider.
-		More: -
+Script: Hash.Persistent.js
+	A Hash that stays in the client for long periods of time
 
-	TODO:
-	 - Test
-	 - Determine best default order
-	 - Implement Factory Pattern to avoid repeated instances attempts ?
+	License:
+		MIT-style license.
 
-	Changelog:
-		- 0.1: Initial release
+	Authors:
+		Guillermo Rauch
 */
-/*! Copyright: Guillermo Rauch <http://devthought.com/> - Distributed under MIT - Keep this message! */
-
-/** Main storage class **/
 
 Hash.Persistent = new Class({
   
@@ -32,7 +24,7 @@ Hash.Persistent = new Class({
     this.setOptions(options);
 		this.context = context || document;
     this.load();
-		this.context.window.addEvent('unload', this.save.bind(this));
+		this.context.getWindow().addEvent('unload', this.save.bind(this), true);
   },
   
   save: function() {
@@ -40,18 +32,21 @@ Hash.Persistent = new Class({
   },
   
   load: function() {
-		this.provider = this.options.provider || Hash.Persistent.Provider;
-		if(! this.provider) {
-			var providers = ($splat(this.options.check) || Hash.Persistent.Providers).filter(function(o) { console.log(o); return o.check.run(this.context, o); });
-			if(providers[0]) this.provider = Hash.Persistent.Provider = providers[0];
+		this.provider = this.options.provider ? Hash.Persistent.Providers[this.options.provider] : Hash.Persistent.Provider;
+		if (!this.provider) {
+			var providers = ($splat(this.options.check) || Hash.Persistent.Providers).filter(function(o) { 
+				return o.check.run(this.context, o); 
+			});
+			if (providers[0]) this.provider = Hash.Persistent.Provider = providers[0];
 		}
-		if(this.provider && this.provider.init) this.provider.init(this.context);
-		var data = this.provider ? JSON.decode(this.provider.retrieve(this.name)) : {};
-    this.hash = $H((data && (this.options.expires === false || (this.options.expires + data[0]) > $time())) ? data[1] : {});		
+		if (this.provider){
+			this.provider.init(this.context);
+			var data = JSON.decode(this.provider.retrieve(this.name));
+	    this.hash = $H((data && (this.options.expires === false || (this.options.expires + data[0]) > $time())) ? data[1] : {});			
+		}	
   }
   
 });
-
 
 Hash.Persistent.implement((function(){
 	
@@ -59,9 +54,7 @@ Hash.Persistent.implement((function(){
 	
 	Hash.each(Hash.prototype, function(method, name){
 		methods[name] = function(){
-			var value = method.apply(this.hash, arguments);
-			if (this.options.autoSave) this.save();
-			return value;
+			return method.apply(this.hash, arguments);
 		};
 	});
 	
@@ -69,35 +62,17 @@ Hash.Persistent.implement((function(){
 	
 })());
 
-// Hash storage providers.
+Hash.Persistent.Providers = {};
+Hash.Persistent.ProvidersSQL = {
+	
+	'create':   "CREATE TABLE IF NOT EXISTS hash (k VARCHAR(50) UNIQUE NOT NULL PRIMARY KEY, v TEXT NOT NULL)",
+	'select':   "SELECT value FROM hash WHERE k = ?",
+	'insert':   "INSERT INTO hash(k, v) VALUES (?, ?)",
+	'delete':   "DELETE FROM hash WHERE k = ?"
+	
+};
 
-Hash.Persistent.Providers = new Hash();
-
-Hash.Persistent.Providers.swiff = new Hash({
-  
-  check: function() {
-		return Browser.Plugins.Flash;
-  },
-
-	init: function(context) {
-		this.el = $(new Swiff('hash.storage.swf')).inject(context.getDocument().body);
-	},
-  
-  retrieve: function(key) {
-    return this.el.get(key);
-  },
-  
-  store: function(key, value) {    
-    this.el.store(key, value);
-  },
-  
-  eliminate: function(key) {
-    this.el.remove(key);
-  }
-  
-});
-
-Hash.Persistent.Providers.ie = new Hash({
+Hash.Persistent.Providers.ie = {
   
   check: function() {
 		return Browser.Engine.trident;
@@ -126,12 +101,12 @@ Hash.Persistent.Providers.ie = new Hash({
     this.element(key).removeAttribute('data');
   }
   
-});
+};
 
-Hash.Persistent.Providers.html5session = new Hash({
+Hash.Persistent.Providers.html5session = {
   
   check: function(context) {
-		return $defined(context.getWindow().sessionStorage);
+		return context.getWindow().sessionStorage;
   },
   
 	init: function(context) {
@@ -150,12 +125,12 @@ Hash.Persistent.Providers.html5session = new Hash({
 		delete this.window.sessionStorage[key]; 
 	}
   
-});
+};
 
-Hash.Persistent.Providers.html5local = new Hash({
+Hash.Persistent.Providers.html5local = {
   
   check: function(context) {
-		return $defined(context.getWindow().localStorage);
+		return context.getWindow().localStorage;
   },
   
 	init: function(context) {
@@ -174,25 +149,14 @@ Hash.Persistent.Providers.html5local = new Hash({
 		delete this.window.localStorage[key];
 	}
   
-});
+};
 
-/*--- Databased-based providers ---*/
-
-Hash.Persistent.ProvidersSQL = new Hash({
-	
-	'create':   "CREATE TABLE IF NOT EXISTS hash (k VARCHAR(50) UNIQUE NOT NULL PRIMARY KEY, v TEXT NOT NULL)",
-	'select':   "SELECT value FROM hash WHERE k = ?",
-	'insert':   "INSERT INTO hash(k, v) VALUES (?, ?)",
-	'delete':   "DELETE FROM hash WHERE k = ?"
-	
-});
-
-Hash.Persistent.Providers.whatwg_db = new Hash({
+Hash.Persistent.Providers.whatwg_db = {
 	
 	check: function(context) {
-		if(window.openDatabase)
+		if(context.getWindow().openDatabase)
 		{
-			this.db = window.openDatabase('hash-persistent', '1.0', 'Hash.Persistent storage', 1024 * 1024);
+			this.db = context.getWindow().openDatabase('hash-persistent', '1.0', 'Hash.Persistent storage', 1024 * 1024);
 			return !! this.db;
 		}
 		return false;
@@ -224,12 +188,12 @@ Hash.Persistent.Providers.whatwg_db = new Hash({
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('delete'), key);
 	}
 	
-});
+};
 
-Hash.Persistent.Providers.gears = new Hash({
+Hash.Persistent.Providers.gears = {
 	
-	check: function() {
-		return window.google && google.gears;
+	check: function(context) {
+		return context.getWindow().google && google.gears;
 	},
 	
 	init: function() {
@@ -252,4 +216,28 @@ Hash.Persistent.Providers.gears = new Hash({
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('delete'), key);
 	}
 	
-});
+};
+
+Hash.Persistent.Providers.swiff = {
+  
+  check: function() {
+		return Browser.Plugins.Flash;
+  },
+
+	init: function(context) {
+		this.el = $(new Swiff('hash.storage.swf')).inject(context.getDocument().body);
+	},
+  
+  retrieve: function(key) {
+    return this.el.get(key);
+  },
+  
+  store: function(key, value) {    
+    this.el.store(key, value);
+  },
+  
+  eliminate: function(key) {
+    this.el.remove(key);
+  }
+  
+};
