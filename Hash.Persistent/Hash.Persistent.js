@@ -103,50 +103,27 @@ Hash.Persistent.Providers.ie = {
   
 };
 
-Hash.Persistent.Providers.html5session = {
+Hash.Persistent.Providers.html5 = {
   
   check: function(context){
-		return context.getWindow().sessionStorage;
+		return $defined(window.localStorage) || $defined(window.globalStorage);
   },
   
 	init: function(context){
-		this.window = context.getWindow();
+		var w = context.getWindow();
+		this.storage = $defined(w.localStorage) ? w.localStorage : w.globalStorage[w.location.hostname];
 	},
 
   retrieve: function(key){ 
-		return this.window.sessionStorage[key]; 
+		return this.storage[key]; 
 	},
   
   store: function(key, value){ 
-		this.window.sessionStorage[key] = value; 
+		this.storage[key] = value; 
 	},
   
   eliminate: function(hash){ 
-		delete this.window.sessionStorage[key]; 
-	}
-  
-};
-
-Hash.Persistent.Providers.html5local = {
-  
-  check: function(context){
-		return context.getWindow().localStorage;
-  },
-  
-	init: function(context){
-		this.window = context.getWindow();
-	},
-
-  retrieve: function(key){ 
-		return this.window.localStorage[key]; 
-	},
-  
-  store: function(key, value){ 
-		this.window.localStorage[key] = value; 
-	},
-  
-  eliminate: function(hash){ 
-		delete this.window.localStorage[key];
+		delete this.storage[key];
 	}
   
 };

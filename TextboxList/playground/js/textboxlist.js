@@ -1,3 +1,19 @@
+/*
+  Moogets - TextboxList 0.2
+  - MooTools version required: 1.2
+  - MooTools components required: Element.Event, Element.Style and dependencies.
+  
+  Credits:
+  - Idea: Facebook + Apple Mail
+  - Caret position method: Diego Perini <http://javascript.nwbox.com/cursor_position/cursor.js>
+  
+  Changelog:
+  - 0.1: initial release
+  - 0.2: code cleanup, small blur/focus fixes
+*/
+
+/* Copyright: Guillermo Rauch <http://devthought.com/> - Distributed under MIT - Keep this message! */
+
 String.implement({
   
   toHash: function(string) {
@@ -11,56 +27,16 @@ String.implement({
   
 });
 
-// Runtime mixins
 
-Class.Mutators = $extend({
+Element.implement({
   
-  Mixins: function(self, klass){  
-    // has to be the first because we need to include events
-    if(! self.Implements) self.Implements = [Events];
-    else self.Implements.include(Events);
-    
-    // now we run and unset the other mutators from here...
-    for(var mut in Class.Mutators){
-      if(mut == 'Mixins') continue;
-      if(self[mut]) {
-        Class.Mutators[mut](self, self[mut]);
-        delete self[mut];
-      }
-    }
-    
-    // ... because we need to edit all methods
-    for(var method in self){
-      if($type(self[method]) == 'function'){
-        var m = self[method];
-        self[method] = function() {
-          m.apply(self, arguments);
-          self.fireEvent(klass + '::' + method, arguments);
-        };
-      }
-    }
-    
-    // add other methods
-    
-    self.registerMixins = function() {
-      Array.flatten(arguments).each(function(mixin) {
-        mixin.enable(self);
-      });
-    };
-  }
-  
-}, Class.Mutators);
-
-
-var Mixin = new Class({
-  
-  initialize: function(forklass, methods) {
-    this.forklass = forklass;
-    this.methods = methods;
-  },
-  
-  enable: function(obj) {
-    for(var method in this.methods) obj.addEvent(this.forklass + '::' + method, this.methods[method]);
+  getCaretPosition: function() {
+    if (this.createTextRange) {
+      var r = document.selection.createRange().duplicate();
+    	r.moveEnd('character', this.value.length);
+    	if (r.text === '') return this.value.length;
+    	return this.value.lastIndexOf(r.text);
+    } else return this.selectionStart;
   }
   
 });
@@ -93,26 +69,20 @@ var TextboxList = new Class({
   
   initialize: function(element, options){
     this.setOptions(options);
-    this.css = this.options.cssclass;
-    this.bits = new Hash;
+    this.data = new Hash;
     this.events = new Hash;
     this.original = $(element);
-    
+
     this.registerMixins(this.options.features);
     this.afterInit();
   },
   
   afterInit: function() {
-    console.log('textboxlist init');
     this.prepare();
     this.create();
     this.set();
   },
-  
-  toElement: function(){
-    return this.textboxlist;
-  },
-  
+
   prepare: function(){
     try {
       this.original.blur();
@@ -121,8 +91,8 @@ var TextboxList = new Class({
   },
   
   create: function(){
-    this.textboxlist = new Element('div', { 'class': this.css });
-    this.inputs = new Element('ul', { 'class': this.css + '-inputs' }).inject(this.textboxlist);
+    this.textboxlist = new Element('div', { 'class': this.options.cssclass });
+    this.inputs = new Element('ul', { 'class': this.options.cssclass + '-inputs' }).inject(this.textboxlist);
     
     if(this.options.inject)
       this.textboxlist.inject(this.original, $type(this.options.inject) == 'string' ? this.options.inject : null);
@@ -132,13 +102,13 @@ var TextboxList = new Class({
     
   },
   
-  createBitBox: function(value){
+  createBitBox: function(data){
     var klass = this.options.boxclass || TextboxListBitBox;
-    eval('return new TextboxListBitBox' + this.options.box.camelCase() + '(this.textboxlist, value);');
+    return new klass(this, data);
   },
   
-  createBitEditable: function(value){
-    return new TextboxListBitEditable(this.textboxlist, value);
+  createBitEditable: function(data){
+    return new TextboxListBitEditable(this, data);
   },
   
   // this function inserts 
@@ -146,9 +116,24 @@ var TextboxList = new Class({
     
   },
   
-  add: function(val){
-    var box = this.createBitBox();
-    
+  add: function(data){
+    var bit = this.createBit(data);
+  },
+  
+  createBit: function(data){
+    if($type(data) == 'string') data = { text: data };
+    if(! data.id) data.id = this.data.length + 1
+    if(! data.html) data.html = data.text;
+    data.object = this.createBitBox(data);
+    this.data.set(data.id, data);    
+    return data.id;
+  },
+  
+  destroyBit: function(id){
+    if(this.data.has(id)){
+      if($(this.data.get(id).object)) $(this.data.get(id).object).destroy();
+      this.data.erase(id);
+    }    
   },
   
   focus: function(){
@@ -181,18 +166,14 @@ var TextboxListBit = new Class({
   
   Implements: Options,
   
-  initialize: function(container, value, uid, features) {
-    this.value = value;
-    this.uid = uid || value;
-    this.container = $(container);
-    this.registerMixins(features);
+  initialize: function(parent, data) {
+    this.parent = parent;
+    this.data = data;
+    this.container = parent.textboxlist;
+    this.registerMixins(parent.options.features);
     this.create();
   },
-  
-  toElement: function(){
-    return this.element
-  },
-  
+   
   is: function(type) {
     return $splat(this.types).contains(type);
   },
@@ -203,6 +184,7 @@ var TextboxListBit = new Class({
       'mouseenter': toggle,
       'mouseleave': toggle
     });
+    return this.element;
   },
   
   replaceWith: function(bit){
@@ -217,15 +199,7 @@ var TextboxListBit = new Class({
   
   destroy: function(){
     this.element.destroy();
-  },
-  
-  setValue: function(v){
-    this.value = v;
-    this.element.set('html', v);
-  },
-  
-  getValue: function(){
-    return this.value;
+    this.parent.destroy(this.data.id);
   },
   
   focus: $empty,
@@ -245,10 +219,6 @@ var TextboxListBitEditable = new Class({
   
   type: 'bit-editable',  
   
-  toElement: function(){
-    return $pick(this.input, this.element);
-  },
-  
   create: function(){
     this.parent();
     this.native = $defined(this.container.contentEditable);
@@ -257,19 +227,21 @@ var TextboxListBitEditable = new Class({
     if(! this.native)
       this.input = $(new InputResizable(new Element('input', { 'type': 'text', 'class': this.type + '-input' }).inject(this.element), this.options.resizable)).inject(this.element);
     
-    new PropertyObserver(this, this.native ? 'html' : 'value', function(v) {
-      this.setValue(v);
-    }.bind(this));
-    
-    this.element = new Element();    
+    new PropertyObserver(this, { 
+      property: this.native ? 'html' : 'value',
+      onChange: function(v) { this.setValue(v); }.bind(this)
+    });
+  
+    return this.element;
   },
   
   setValue: function(v){
-    if(this.native) this.parent();
-    else {
-      this.value = v;
-      this.input.set('value', v);
-    }
+    this.value = v;
+    $(this).set(this.native ? 'html' : 'value', v);
+  },
+  
+  getValue: function(){
+    return this.value;
   },
   
   focus: function(){
@@ -285,14 +257,14 @@ var TextboxListBitEditable = new Class({
 
 var TextboxListBitEditableSmall = new Class({
 
+  Extends: TextboxListBitEditable,
+  
   
 
 });
 
 
 var TextboxListBitBox = new Class({
-  
-  Mixins: 'TextboxListBitBox',
   
   Extends: TextboxListBit,
   
@@ -301,21 +273,33 @@ var TextboxListBitBox = new Class({
 });
 
 
-var TextboxListBitBoxClosable = new Mixin('TextboxListBitBox', {
+var TextboxListBitBoxClosable = new Class({
 
-  
+  Extends: TextboxListBitBox,
+
+  create: function(ret){
+    this.parent();
+    this.element.adopt(new Element('a', { 'class': 'bit-box-closable' }).addEvent('click', function(){
+      this.destroy();
+    }));
+  }
     
 });
 
 
 var TextboxListAutocomplete = new Mixin('TextboxList', {
   
-  afterInit: function() {
-    console.log('autocomplete init');
+  afterInit: function(){
+    this.autodata = new Hash;
   },
   
-  autoFeed: function() {
-    
+  createBit: function(ret, data){
+    var index = data.index ? data.index : (String.standarize ? String.standarize(data.text) : data.text);
+    this.data[index].index = index;
+  },
+  
+  autoFeed: function(data, customhtml){
+    this.autodata.set(data.index, [data, customhtml]);
   }
   
 });
@@ -324,7 +308,7 @@ var TextboxListAutocomplete = new Mixin('TextboxList', {
 var TextboxListEnter = new Mixin('TextboxList', {
   
   afterInit: function() {  
-    console.log('enter init');
+    
   }
   
 });
@@ -332,8 +316,8 @@ var TextboxListEnter = new Mixin('TextboxList', {
 
 var TextboxListDrag = new Mixin('TextboxList', {
   
-  add: function() {
-    // when a box is added, make it draggable
+  add: function(ret) {
+    ret.makeDraggable({ container: this.textboxlist });
   }
   
 });
