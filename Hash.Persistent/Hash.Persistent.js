@@ -19,7 +19,7 @@ Hash.Persistent = new Class({
 		expires: false
   },
   
-  initialize: function(name, options, context) {
+  initialize: function(name, options, context){
     this.name = name;
     this.setOptions(options);
 		this.context = context || document;
@@ -27,11 +27,11 @@ Hash.Persistent = new Class({
 		this.context.getWindow().addEvent('unload', this.save.bind(this), true);
   },
   
-  save: function() {
+  save: function(){
     if(this.provider) this.provider.store(this.name, JSON.encode([$time(), this.hash]));
   },
   
-  load: function() {
+  load: function(){
 		this.provider = this.options.provider ? Hash.Persistent.Providers[this.options.provider] : Hash.Persistent.Provider;
 		if (!this.provider) {
 			var providers = ($splat(this.options.check) || Hash.Persistent.Providers).filter(function(o) { 
@@ -74,30 +74,30 @@ Hash.Persistent.ProvidersSQL = {
 
 Hash.Persistent.Providers.ie = {
   
-  check: function() {
+  check: function(){
 		return Browser.Engine.trident;
   },
 
-	init: function(context) {		
+	init: function(context){		
 		this.body = context.getDocument().body;		
 	},
 	
-	element: function(id) {
+	element: function(id){
 		if($('hash_persistent-' + id)) return $('hash_persistent-' + id);
 		var el = new Element('div', { 'id': 'hash_persistent-' + id }).inject(this.body);
 		el.addBehavior('#default#userData');
 		return el;
 	},
   
-  retrieve: function(key) {    
+  retrieve: function(key){    
 		return this.element(key).getAttribute('data');
   },
   
-  store: function(key, value) {    
+  store: function(key, value){    
     this.element(key).setAttribute('data', value);
   },
   
-  eliminate: function(hash) {
+  eliminate: function(hash){
     this.element(key).removeAttribute('data');
   }
   
@@ -105,23 +105,23 @@ Hash.Persistent.Providers.ie = {
 
 Hash.Persistent.Providers.html5session = {
   
-  check: function(context) {
+  check: function(context){
 		return context.getWindow().sessionStorage;
   },
   
-	init: function(context) {
+	init: function(context){
 		this.window = context.getWindow();
 	},
 
-  retrieve: function(key) { 
+  retrieve: function(key){ 
 		return this.window.sessionStorage[key]; 
 	},
   
-  store: function(key, value) { 
+  store: function(key, value){ 
 		this.window.sessionStorage[key] = value; 
 	},
   
-  eliminate: function(hash) { 
+  eliminate: function(hash){ 
 		delete this.window.sessionStorage[key]; 
 	}
   
@@ -129,23 +129,23 @@ Hash.Persistent.Providers.html5session = {
 
 Hash.Persistent.Providers.html5local = {
   
-  check: function(context) {
+  check: function(context){
 		return context.getWindow().localStorage;
   },
   
-	init: function(context) {
+	init: function(context){
 		this.window = context.getWindow();
 	},
 
-  retrieve: function(key) { 
+  retrieve: function(key){ 
 		return this.window.localStorage[key]; 
 	},
   
-  store: function(key, value) { 
+  store: function(key, value){ 
 		this.window.localStorage[key] = value; 
 	},
   
-  eliminate: function(hash) { 
+  eliminate: function(hash){ 
 		delete this.window.localStorage[key];
 	}
   
@@ -153,7 +153,7 @@ Hash.Persistent.Providers.html5local = {
 
 Hash.Persistent.Providers.whatwg_db = {
 	
-	check: function(context) {
+	check: function(context){
 		if(context.getWindow().openDatabase)
 		{
 			this.db = context.getWindow().openDatabase('hash-persistent', '1.0', 'Hash.Persistent storage', 1024 * 1024);
@@ -162,16 +162,16 @@ Hash.Persistent.Providers.whatwg_db = {
 		return false;
 	},
 	
-	execute: function() {
+	execute: function(){
 		var a = arguments;
 		this.db.transaction(function(tx) { tx.executeSql.run(a); });
 	},
 	
-	init: function() {
+	init: function(){
 		this.execute(Hash.Persistent.ProvidersSQL.get('create'));
 	},
 	
-	retrieve: function(key) {
+	retrieve: function(key){
 		var r = null;
 		this.execute(Hash.Persistent.ProvidersSQL.get('select'), key, function(tx, result) {
 			if(result.rows.item(0)) r = result.rows.item(0)['v'];
@@ -179,12 +179,12 @@ Hash.Persistent.Providers.whatwg_db = {
 		return r;
 	},
 	
-	store: function(key, value) {
+	store: function(key, value){
 		this.eliminate(key);
 		this.execute(Hash.Persistent.ProvidersSQL.get('insert'), [key, value]);
 	},
 	
-	eliminate: function(key) {
+	eliminate: function(key){
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('delete'), key);
 	}
 	
@@ -192,27 +192,27 @@ Hash.Persistent.Providers.whatwg_db = {
 
 Hash.Persistent.Providers.gears = {
 	
-	check: function(context) {
+	check: function(context){
 		return context.getWindow().google && google.gears;
 	},
 	
-	init: function() {
+	init: function(){
 		this.db = google.gears.factory.create('beta.database', '1.0');
 		this.db.open('hash-persistent');
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('create'));
 	},
 	
-	retrieve: function(key) {
+	retrieve: function(key){
 		var rs = this.db.execute(Hash.Persistent.ProvidersSQL.get('select'), key);
 		return rs.isValidRow() ? rs.field(0) : false;
 	},
 	
-	store: function(key, value) {
+	store: function(key, value){
 		this.eliminate(key);
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('insert'), [key, value]);
 	},
 	
-	eliminate: function(key) {
+	eliminate: function(key){
 		this.db.execute(Hash.Persistent.ProvidersSQL.get('delete'), key);
 	}
 	
@@ -220,23 +220,23 @@ Hash.Persistent.Providers.gears = {
 
 Hash.Persistent.Providers.swiff = {
   
-  check: function() {
+  check: function(){
 		return Browser.Plugins.Flash;
   },
 
-	init: function(context) {
-		this.el = $(new Swiff('hash.storage.swf')).inject(context.getDocument().body);
+	init: function(context){
+		this.el = $(new Swiff('hash.persistent.swf')).inject(context.getDocument().body);
 	},
   
-  retrieve: function(key) {
+  retrieve: function(key){
     return this.el.get(key);
   },
   
-  store: function(key, value) {    
+  store: function(key, value){    
     this.el.store(key, value);
   },
   
-  eliminate: function(key) {
+  eliminate: function(key){
     this.el.remove(key);
   }
   
