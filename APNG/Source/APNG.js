@@ -37,13 +37,13 @@ var APNG = new Class({
 			this.setSrc(this.basename + '-anim.png');
 			this.start = this.reset = this.pause = this.resume = this.cancel = $empty;
 		} else {
-			this.preload();
+			if (this.options.preload) this.preload();
 			this.reset(! this.options.autoStart);
 		}
 	},
 	
 	setSrc: function(src, index){
-		if(this.options.property != 'background-position') {
+		if (this.options.property != 'background-position') {
 			this.options.property == 'src' ? this.element.set('src', src) : this.element.setStyle('background-image', 'url('+ src +')');
 			if (this.options.addFilter) {
 				this.element.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+src+"',sizingMethod='crop')";
