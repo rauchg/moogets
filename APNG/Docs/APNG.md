@@ -35,14 +35,14 @@ APNG Method: constructor {#APNG:constructor}
 * autoStart - (*boolean*, defaults to true) Whether the animation starts or not when the APNG instance is created.
 * startFrame - (*integer*, defaults to 1) The index of the frame displayed first 
 * preload - (*integer*, defaults to true) If 'src' or 'background-image' are used, preload images. Useful if autoStart is set to false
-* native - (*boolean*, defaults to true in FF/Opera) Whether to fallback to a file with format {basename}-anim.png if the browser supports real APNGs.
+* useNative - (*boolean*, defaults to true in FF/Opera) Whether to fallback to a file with format {basename}-anim.png if the browser supports real APNGs.
 * addFilter - (*boolean*, defaults to true in IE) Whether to add the PNG filter correction for trident.
 
 
 ### Notes
 
 - The frame 1 should be called something-like-this.png. Subsequent frames are called something-like-{frame}.png (for example something-like-2.png). 
-- If native fallback is on, you can provide a something-like-this-anim.png with a real APNG. If you don't plan to create one, make sure you set native to false.
+- If native fallback is on, you can provide a something-like-this-anim.png with a real APNG. If you don't plan to create one, make sure you set useNative to false.
 - If you're using an IE behavior to fix PNG transparency, set addFilter false.
 
 ### See Also:
