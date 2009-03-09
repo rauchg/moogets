@@ -43,7 +43,9 @@ APNG Method: constructor {#APNG:constructor}
 
 - The frame 1 should be called something-like-this.png. Subsequent frames are called something-like-{frame}.png (for example something-like-2.png). 
 - If native fallback is on, you can provide a something-like-this-anim.png with a real APNG. If you don't plan to create one, make sure you set useNative to false.
-- If you're using an IE behavior to fix PNG transparency, set addFilter false.
+- If you're using an IE behavior to fix PNG transparency, set addFilter false. Otherwise, make sure APNG.blankImage contains the path to a blank.gif image.
+
+  APNG.blankImage = '/images/blank.gif';
 
 ### See Also:
 

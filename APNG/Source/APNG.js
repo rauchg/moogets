@@ -24,7 +24,7 @@ var APNG = new Class({
 		startFrame: 1,
 		preload: true,
 		useNative: Browser.Engine.gecko19 || Browser.Engine.presto950,
-		addFilter: Browser.Engine.trident
+		addFilter: Browser.Engine.trident3
 	},
 	
 	initialize: function(element, options){
@@ -47,7 +47,7 @@ var APNG = new Class({
 			this.options.property == 'src' ? this.element.set('src', src) : this.element.setStyle('background-image', 'url('+ src +')');
 			if (this.options.addFilter) {
 				this.element.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='"+src+"',sizingMethod='crop')";
-				this.element.setSrc(APNG.blankImage || '/blank.gif');
+				this.setSrc(APNG.blankImage || '/blank.gif');
 			}
 		} else {
 			var px = index * this.element['get' + (this.options.axis == 'x' ? 'Width' : 'Height')]();
