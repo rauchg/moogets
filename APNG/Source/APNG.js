@@ -23,7 +23,7 @@ var APNG = new Class({
 		autoStart: true,
 		startFrame: 1,
 		preload: true,
-		native: Browser.Engine.gecko19 || Browser.Engine.presto950,
+		useNative: Browser.Engine.gecko19 || Browser.Engine.presto950,
 		addFilter: Browser.Engine.trident
 	},
 	
@@ -33,7 +33,7 @@ var APNG = new Class({
 		if (this.occlude('apng')) return this.occluded;
 		this.original = this.options.property == 'src' ? this.element.src : this.element.getStyle('background-image').replace(/url\((.*)\)/i, '$1');
 		this.basename = this.original.substr(0, this.original.length - this.options.ext.length);
-		if (this.options.native){
+		if (this.options.useNative){
 			this.setSrc(this.basename + '-anim.png');
 			this.start = this.reset = this.pause = this.resume = this.cancel = $empty;
 		} else {
