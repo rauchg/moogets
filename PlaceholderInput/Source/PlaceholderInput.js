@@ -15,6 +15,7 @@ var PlaceholderInput = new Class({
     this.klass = klass || 'input_placeholder';
     this.element = $(element).store('placeholder', this);    
     this.placeholder = this.element.get('placeholder');
+		this.type = this.element.get('type');
     this.element.addEvents({
       'focus': this.focus.bind(this),
       'blur': this.blur.bind(this)
@@ -24,14 +25,14 @@ var PlaceholderInput = new Class({
   
   focus: function(){
     if(this.placeholder && (this.element.get('value', true) == this.placeholder) && this.active) {
-      this.element.set('value', '', true).removeClass(this.klass);
+      this.element.set('type', this.type).set('value', '', true).removeClass(this.klass);
 			this.active = false;
     }
   },
   
   blur: function(){
     if(this.placeholder && this.element.get('value', true) == '') {
-      this.element.addClass(this.klass).set('value', this.placeholder, true);
+      this.element.addClass(this.klass).set('type', 'text').set('value', this.placeholder, true);
       this.active = true;
     }
   },

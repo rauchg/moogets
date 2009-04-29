@@ -1,0 +1,14 @@
+#slideshow * { margin: 0; padding: 0; }
+#slideshow { background: url('../images/bg_shadow.gif') no-repeat top; position: relative; padding: 14px 0 15px; width: 603px; height: 306px; }
+#slideshow #menu, #slideshow #pictures, #slideshow #loading { position: absolute; }
+#slideshow #loading { background: url('../images/spinner.gif'); display: block; top: 158px; left: 205px; text-indent: -5000px; width: 24px; height: 24px; visibility: hidden; z-index: 5; }
+#slideshow #pictures { background: url('../images/bg.jpg'); width: 437px; height: 277px; left: 0; overflow: hidden; }
+#slideshow #pictures li { display: block; position: absolute; top: 0; width: 437px; }
+#slideshow #pictures li img { display: block; position: relative; bottom: 0; }
+#slideshow #menu { background: url('../images/bg_side.jpg'); list-style-type: none; width: 166px; height: 257px; right: 0; padding-top: 20px; }
+#slideshow #menu li { display: block; z-index: 1000; position: relative; zoom: 1; }
+#slideshow #menu li a { display: block; font: 11px "Lucida Grande", "Verdana"; text-decoration: none; padding: 7px 0 7px 28px; z-index: 1000; color: #ccc; line-height: 14px; vertical-align: middle; zoom: 1; }
+#slideshow #menu li a:focus { outline: 0; }
+#slideshow #menu li a:hover { color: #fff; }
+#slideshow #menu li.current a { font: 15px "Georgia"; color: #fff; padding: 5px 0 5px 28px; line-height: 18px; }
+#slideshow #menu li.background { background: url('../images/arrow.gif') no-repeat left center; position: absolute; font-size: 1px; height: 7px; width: 4px; z-index: 5; }

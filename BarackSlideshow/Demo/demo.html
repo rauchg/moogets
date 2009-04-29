@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>BarackSlideshow 0.2 Demo</title>
+    
+    <link rel="stylesheet" href="css/barackslideshow.css" type="text/css" media="screen" title="Stylesheet" charset="utf-8" />
+    
+    <script type="text/javascript" charset="utf-8" src="mootools-core-1.2.1-yc.js"></script>
+    <script type="text/javascript" charset="utf-8" src="mootools-more-yc.js"></script>    
+    <script type="text/javascript" charset="utf-8" src="Fx.MorphList.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../Source/BarackSlideshow.js"></script>    
+    <script type="text/javascript" charset="utf-8" src="demo.js"></script>
+  </head>
+  <body id="demo">    
+    
+    <h1>BarackSlideshow Demo</h1>
+    <p><a href="http://devthought.com/mootools/projects/barackslideshow/">(back to Devthought)</a></p>
+    <p>Inspired by the slideshow in <a href="http://barackobama.com/">Barack Obama</a> website. Implemented by extending <a href="http://devthought.com/mootools/projects/morphlist/">MorphList</a></p>
+    
+    <div id="slideshow">    
+      <span id="loading">Loading</span>
+    
+      <ul id="pictures">
+        <li><img src="images/cities/melbourne.jpg" alt="Melbourne" title="Melbourne" /></li>
+        <li><img src="images/cities/buenos_aires.jpg" alt="Buenos Aires" title="Buenos Aires" /></li>
+        <li><img src="images/cities/urubamba.jpg" alt="Urubamba" title="Urubamba" /></li>
+        <li><img src="images/cities/london.jpg" alt="London" title="London" /></li>
+        <li><img src="images/cities/venice.jpg" alt="Venice" title="Venice" /></li>
+        <li><img src="images/cities/paris.jpg" alt="Paris" title="Paris" /></li>
+        <li><img src="images/cities/osaka.jpg" alt="Osaka" title="Osaka" /></li>        
+      </ul>
+      
+      <ul id="menu">
+        <li><a href="images/cities/melbourne.jpg">Melbourne</a></li>
+        <li><a href="images/cities/buenos_aires.jpg">Buenos Aires</a></li>
+        <li><a href="images/cities/urubamba.jpg">Urubamba</a></li>
+        <li><a href="images/cities/london.jpg">London</a></li>
+        <li><a href="images/cities/venice.jpg">Venice</a></li>
+        <li><a href="images/cities/paris.jpg">Paris</a></li>
+        <li><a href="images/cities/osaka.jpg">Osaka</a></li>
+      </ul>
+    </div>
+    
+    <div id="slideshow-options">
+      <h2>Options</h2>
+      <h3>Transition</h3>
+      <ul>
+        <li><input type="radio" name="transition" value="alternate" id="transition-alternate" checked="checked" /> <label for="transition-alternate">slide-fade progression</label></li>
+        <li><input type="radio" name="transition" value="random" id="transition-random" /> <label for="transition-random">random</label></li>         
+        <li><input type="radio" name="transition" value="slide-left" id="transition-slide-left" /> <label for="transition-slide-left">slide left</label></li> 
+        <li><input type="radio" name="transition" value="slide-right" id="transition-slide-right" /> <label for="transition-slide-right">slide right</label></li> 
+        <li><input type="radio" name="transition" value="slide-bottom" id="transition-slide-bottom" /> <label for="transition-slide-bottom">slide bottom</label></li> 
+        <li><input type="radio" name="transition" value="slide-top" id="transition-slide-top" /> <label for="transition-slide-top">slide top</label></li>                         
+        <li><input type="radio" name="transition" value="fade" id="transition-fade" /> <label for="transition-fade">fade</label></li>     
+      </ul>
+      
+      <h3><label for="option-auto">Auto</label> <input type="checkbox" name="auto" checked="checked" id="option-auto" /></h3>
+    </div>
+    
+  </body>  
+</html>

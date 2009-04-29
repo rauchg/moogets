@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>PlaceholderInput demo</title>
+    
+    <style type="text/css" media="screen">
+      .input_placeholder { color: #999; }
+    </style>
+    
+    <script src="mootools-1.2.1-core-yc.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../Source/PlaceholderInput.js" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+      window.addEvent('domready', function(){
+				// refer to http://devthought.com/blog/client-side/2009/02/adding-placeholders-to-inputs-in-javascript/
+				// to understand the markup variations
+
+				// for markup #1
+				$$('input[placeholder]').each(function(el){
+				   new PlaceholderInput(el);
+				});
+
+				// for markup #2
+				$$('label.placeholder').each(function(el){
+				  var target = $pick($(el.get('for')), el.getNext());
+				  if (target && (target.get('type').test(/text|pass/) || target.get('tag') == 'textarea')){
+				   	target.set('placeholder', el.get('text'));
+				   	el.destroy();
+				   	new PlaceholderInput(target);
+					}
+				});
+
+				$('get_values_button').addEvent('click', function(){
+				  $('value_email').set('html', '"' + $('email').get('value') + '"');
+				  $('value_name').set('html', '"' + $('name').get('value') + '"');
+				  $('value_pass').set('html', '"' + $('pass').get('value') + '"');
+				});
+      });
+    </script>
+  </head>
+  <body id="index">
+    
+    <h1>PlaceholderInput demo</h1>
+    
+    <p>Go to <a href="http://devthought.com/projects/mootools/placeholderinput/">Devthought project page</a></p>
+    
+    <form action="index_submit" method="get" accept-charset="utf-8">
+      <fieldset id="contact_details" class="">
+        <legend>Contact details</legend>
+        
+        <p>
+        <label for="email" class="placeholder">Email</label><input type="text" name="email" value="" id="email" />
+        </p>
+        
+        <p>
+        <label for="name" class="placeholder">Name</label><input type="text" name="name" value="" id="name" />        
+        </p>
+
+        <p>
+        <label for="pass" class="placeholder">Password</label><input type="password" name="pass" value="" id="pass" />        
+        </p>
+        
+      </fieldset>
+    </form>
+    
+    <h2>Test $(element).get('value')</h2>
+    <p>The value should be empty if the placeholder is set</p>
+    
+    <p>Email: <span id="value_email" style="background: yellow">""</span></p>
+    <p>Name: <span id="value_name" style="background: yellow;">""</span></p>
+    <p>Pass: <span id="value_pass" style="background: yellow;">""</span></p>
+    
+    <button id="get_values_button">Update values</button>
+    
+  </body>  
+</html>

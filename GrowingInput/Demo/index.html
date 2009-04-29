@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>GrowingInput demo</title>
+    
+    <style type="text/css" media="screen">
+      input.growing { 
+        border: 1px solid #999; 
+        font: 11px "Lucida Grande", Verdana;
+        overflow: hidden;
+        padding: 3px;
+      }
+      
+      input.growing:focus {
+        outline: 0;
+        border: 1px solid #666;
+      }
+    </style>
+    
+    <script src="mootools-1.2.1-core-yc.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../Source/GrowingInput.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../../mootools-more/Source/Native/String.Extras.js" type="text/javascript" charset="utf-8"></script>
+    
+    <script type="text/javascript" charset="utf-8">
+      window.addEvent('domready', function(){
+         // for markup #1
+         $$('input.growing').each(function(el){
+            new GrowingInput(el, { min: 3, max: 20 });
+         });
+      });
+    </script>
+  </head>
+  <body id="index">
+    
+    <h1>GrowingInput demo</h1>
+    
+    <p>Go to <a href="http://devthought.com/projects/mootools/growinginput/">Devthought project page</a></p>
+    
+    <form action="index_submit" method="get" accept-charset="utf-8">
+      <fieldset id="contact_details" class="">
+        <legend>Contact details</legend>
+        
+        <p>        
+        <label>Name:</label>
+        <input type="text" name="email" value="" id="email" class="growing" autocomplete="off" />
+        </p>
+        
+      </fieldset>
+    </form>
+    
+  </body>  
+</html>
